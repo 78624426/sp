@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="loginServiceTarget" class="service.impl.LoginServiceImpl"></bean>
+    <!--配置通知-->
+    <bean id="logAdvice" class="advice.LogAdvice"></bean>
+    <bean id="goodBye" class="advice.GoodByeAdvice"></bean>
+
+    <bean id="goodByeAdvisor" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="advice" ref="goodBye"></property>
+        <property name="mappedNames">
+            <list>
+                <value>login</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="logAdvisor" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="advice" ref="logAdvice"></property>
+        <property name="mappedNames">
+            <list>
+                <value>logout</value>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="loginProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target" ref = "loginServiceTarget"></property>
+        <!--如果只有一个接口：<property name="proxyInterfaces" value="service.LoginService"></property>-->
+        <property name="proxyInterfaces">
+            <list>
+                <value>service.LoginService</value>
+            </list>
+        </property>
+        <property name="interceptorNames" >
+            <list>
+                <value>logAdvisor</value>
+                <value>goodByeAdvisor</value>
+            </list>
+        </property>
+
+    </bean>
+</beans>
